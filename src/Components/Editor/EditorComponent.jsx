@@ -69,6 +69,10 @@ const CustomEditor = {
   },
 };
 
+const print = (value) => {
+  console.log(value.children);
+};
+
 export default function EditorComponent() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [value, setValue] = useState([
@@ -102,8 +106,8 @@ export default function EditorComponent() {
           );
           if (isAstChange) {
             // Save the value to Local Storage.
-            const content = JSON.stringify(value);
-            localStorage.setItem('content', content);
+            // const content = JSON.stringify(value);
+            localStorage.setItem('content', value);
           }
         }}
       >
@@ -124,14 +128,14 @@ export default function EditorComponent() {
           >
             Code Block
           </button>
-          {/* <button
+          <button
             onMouseDown={(e) => {
               e.preventDefault();
-              CustomEditor.toggleCodeBlock(editor);
+              print(editor);
             }}
           >
             print
-          </button> */}
+          </button>
         </div>
         <Editable
           renderElement={renderElement}
