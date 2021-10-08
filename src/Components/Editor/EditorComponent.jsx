@@ -5,15 +5,15 @@ import { withHistory } from 'slate-history';
 import isHotkey from 'is-hotkey';
 import {
   FormatBold,
-  FormatItalic,
-  FormatUnderlined,
-  Code,
-  LooksOne,
-  LooksTwo,
-  FormatQuote,
-  FormatListNumbered,
-  FormatListBulleted,
-  Transform,
+  // FormatItalic,
+  // FormatUnderlined,
+  // Code,
+  // LooksOne,
+  // LooksTwo,
+  // FormatQuote,
+  // FormatListNumbered,
+  // FormatListBulleted,
+  // Transform,
 } from '@material-ui/icons';
 import { toggleMark } from './util';
 
@@ -24,6 +24,8 @@ import { Editable } from 'slate-react';
 import CodeElement from './CodeElement/CodeElement';
 import DefaultElement from './DefaultElement/DefaultElement';
 import LeafElement from './LeafElement/LeafElement';
+import { SvgIcon } from '@material-ui/core';
+import ToolButton from './ToolButton/ToolButton';
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -73,6 +75,51 @@ const print = (value) => {
   console.log(value.children);
 };
 
+const onKeyDown = (event, editor) => {
+  if (!event.ctrlKey) {
+    return;
+  }
+
+  switch (event.key) {
+    case '`': {
+      event.preventDefault();
+      CustomEditor.toggleBoldMark(editor);
+      break;
+    }
+    case 'b': {
+      event.preventDefault();
+      CustomEditor.toggleBoldMark(editor);
+      break;
+    }
+    default:
+      break;
+  }
+
+  if (event.key === '`' && event.ctrlKey) {
+    event.preventDefault();
+    const [match] = Editor.nodes(editor, {
+      match: (n) => n.type === 'code',
+    });
+    Transforms.setNodes(
+      editor,
+      { type: match ? 'paragraph' : 'code' },
+      { match: (n) => Editor.isBlock(editor, n) }
+    );
+  }
+};
+
+const onChangeSlate = (value, editor, setValue) => {
+  setValue(value);
+  const isAstChange = editor.operations.some(
+    (op) => 'set_selection' !== op.type
+  );
+  if (isAstChange) {
+    // Save the value to Local Storage.
+    // const content = JSON.stringify(value);
+    localStorage.setItem('content', value);
+  }
+};
+
 export default function EditorComponent() {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const [value, setValue] = useState([
@@ -100,25 +147,28 @@ export default function EditorComponent() {
         editor={editor}
         value={value}
         onChange={(value) => {
-          setValue(value);
-          const isAstChange = editor.operations.some(
-            (op) => 'set_selection' !== op.type
-          );
-          if (isAstChange) {
-            // Save the value to Local Storage.
-            // const content = JSON.stringify(value);
-            localStorage.setItem('content', value);
-          }
+          onChangeSlate(value, editor, setValue);
         }}
       >
         <div>
+          <MarkButton format="bold" icon="format_bold" />
+
+          {/* <MarkButton
+            icon={FormatBold}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              CustomEditor.toggleBoldMark(editor);
+            }}
+          >
+            {FormatBold}
+          </MarkButton>
           <button
             onMouseDown={(e) => {
               e.preventDefault();
               CustomEditor.toggleBoldMark(editor);
             }}
           >
-            Bold
+            <SvgIcon component={FormatBold} />
           </button>
           <button
             onMouseDown={(e) => {
@@ -135,7 +185,7 @@ export default function EditorComponent() {
             }}
           >
             print
-          </button>
+          </button> */}
         </div>
         <Editable
           renderElement={renderElement}
@@ -143,37 +193,8 @@ export default function EditorComponent() {
           renderLeaf={renderLeaf}
           spellCheck
           autoFocus
-          onKeyDown={(event) => {
-            if (!event.ctrlKey) {
-              return;
-            }
-
-            switch (event.key) {
-              case '`': {
-                event.preventDefault();
-                CustomEditor.toggleBoldMark(editor);
-                break;
-              }
-              case 'b': {
-                event.preventDefault();
-                CustomEditor.toggleBoldMark(editor);
-                break;
-              }
-              default:
-                break;
-            }
-
-            if (event.key === '`' && event.ctrlKey) {
-              event.preventDefault();
-              const [match] = Editor.nodes(editor, {
-                match: (n) => n.type === 'code',
-              });
-              Transforms.setNodes(
-                editor,
-                { type: match ? 'paragraph' : 'code' },
-                { match: (n) => Editor.isBlock(editor, n) }
-              );
-            }
+          onKeyDown={(event, editor) => {
+            onKeyDown(event, editor);
           }}
         />
       </Slate>

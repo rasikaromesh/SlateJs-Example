@@ -1,22 +1,24 @@
+import React from 'react';
 import { useSlate } from 'slate-react';
 
-import { toggleMark, isMarkActive } from '../util';
+import { isMarkActive, toggleMark } from '../util';
 
-import Button from './Button/Button';
-import Icon from './Icon/Icon';
-import './markButton.scss';
+import Button from '../../Common/Button/Button';
+import Icon from '../../Common/Icon/Icon';
 
-export default function MarkButton({ format, icon }) {
+const MarkButton = ({ format, icon }) => {
   const editor = useSlate();
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={(e) => {
-        e.preventDefault();
+      onMouseDown={(event) => {
+        event.preventDefault();
         toggleMark(editor, format);
       }}
     >
-      <Icon> {icon}</Icon>
+      <Icon>{icon}</Icon>
     </Button>
   );
-}
+};
+
+export default MarkButton;

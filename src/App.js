@@ -1,10 +1,10 @@
 import './App.css';
-import EditorComponent from './Components/Editor/EditorComponent';
+import RichTextEditor from './Components/slateJs/RichTextEditor';
 
 function App() {
   return (
     <div className="App">
-      <EditorComponent />
+      <RichTextEditor />
     </div>
   );
 }

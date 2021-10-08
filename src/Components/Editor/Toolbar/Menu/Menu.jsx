@@ -1,5 +1,7 @@
-import React from 'react';
+/** @jsxRuntime classic */
+/** @jsx jsx */
 import { jsx, css } from '@emotion/react';
+import React from 'react';
 import './menu.scss';
 
 const Menu = React.forwardRef(({ className, ...props }, ref) => (
